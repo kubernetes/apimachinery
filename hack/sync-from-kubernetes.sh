@@ -44,7 +44,7 @@ newKubeSHA=$(git log --oneline --format='%H' kube-sync -1)
 git filter-branch -f --subdirectory-filter staging/src/k8s.io/apimachinery HEAD
 
 newBranchSHA=$(git log --oneline --format='%H' kube-sync -1)
-git log --format='%H' --reverse ${previousBranchSHA}..HEAD > ${dir}/commits
+git log --no-merges --format='%H' --reverse ${previousBranchSHA}..HEAD > ${dir}/commits
 
 git checkout ${currBranch}
 
