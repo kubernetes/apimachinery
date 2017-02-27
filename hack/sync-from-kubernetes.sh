@@ -49,14 +49,6 @@ git log --no-merges --format='%H' --reverse ${previousBranchSHA}..HEAD > ${dir}/
 
 git checkout ${currBranch}
 
-# we must reset Godeps.json to what it looked like BEFORE the last vendor sync so that any
-# new Godep.json changes from k8s.io/kubernetes will apply cleanly.  Since its always auto-generated
-# it doesn't matter that we're removing it
-lastResyncCommit=$(git rev-list -n 1 --grep "sync: resync vendor folder" HEAD)
-cleanGodepJsonCommit=$(git rev-list -n 1 ${lastResyncCommit}^)
-git checkout ${cleanGodepJsonCommit} Godeps/Godeps.json
-git commit -m "sync: reset Godeps.json" -- Godeps/Godeps.json
-
 while read commitSHA; do
 	echo "working ${commitSHA}"
 	git cherry-pick ${commitSHA}
