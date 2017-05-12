@@ -1,6 +1,6 @@
 {
 	"ImportPath": "k8s.io/apimachinery",
-	"GoVersion": "go1.7",
+	"GoVersion": "go1.8",
 	"GodepVersion": "v79",
 	"Packages": [
 		"./..."
@@ -8,7 +8,6 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/PuerkitoBio/purell",
-			"Comment": "v1.0.0",
 			"Rev": "8a290539e2e8629dbc4e6bad948158f790ec31f4"
 		},
 		{
@@ -29,17 +28,14 @@
 		},
 		{
 			"ImportPath": "github.com/elazarl/goproxy",
-			"Comment": "v1.0-104-gc4fc265",
 			"Rev": "c4fc26588b6ef8af07a191fcb6476387bdd46711"
 		},
 		{
 			"ImportPath": "github.com/emicklei/go-restful",
-			"Comment": "v1.2-96-g09691a3",
 			"Rev": "09691a3b6378b740595c1002f40c34dd5f218a22"
 		},
 		{
 			"ImportPath": "github.com/emicklei/go-restful/log",
-			"Comment": "v1.2-96-g09691a3",
 			"Rev": "09691a3b6378b740595c1002f40c34dd5f218a22"
 		},
 		{
@@ -68,12 +64,10 @@
 		},
 		{
 			"ImportPath": "github.com/gogo/protobuf/proto",
-			"Comment": "v0.4-3-gc0656ed",
 			"Rev": "c0656edd0d9eab7c66d1eb0c568f9039345796f7"
 		},
 		{
 			"ImportPath": "github.com/gogo/protobuf/sortkeys",
-			"Comment": "v0.4-3-gc0656ed",
 			"Rev": "c0656edd0d9eab7c66d1eb0c568f9039345796f7"
 		},
 		{
@@ -170,7 +164,6 @@
 		},
 		{
 			"ImportPath": "gopkg.in/inf.v0",
-			"Comment": "v0.9.0",
 			"Rev": "3887ee99ecf07df5b447e9b00d9c0b2adaa9f3e4"
 		},
 		{
