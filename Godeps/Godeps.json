@@ -8,7 +8,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/davecgh/go-spew",
-			"Rev": "782f4967f2dc"
+			"Rev": "v1.1.1"
 		},
 		{
 			"ImportPath": "github.com/docker/spdystream",
@@ -44,7 +44,7 @@
 		},
 		{
 			"ImportPath": "github.com/google/uuid",
-			"Rev": "8c31c18f31ed"
+			"Rev": "v1.0.0"
 		},
 		{
 			"ImportPath": "github.com/googleapis/gnostic",
@@ -84,7 +84,7 @@
 		},
 		{
 			"ImportPath": "github.com/pmezard/go-difflib",
-			"Rev": "5d4384ee4fb2"
+			"Rev": "v1.0.0"
 		},
 		{
 			"ImportPath": "github.com/spf13/pflag",
@@ -92,7 +92,7 @@
 		},
 		{
 			"ImportPath": "github.com/stretchr/testify",
-			"Rev": "c679ae2cc0cb"
+			"Rev": "v1.2.2"
 		},
 		{
 			"ImportPath": "golang.org/x/net",
@@ -104,11 +104,15 @@
 		},
 		{
 			"ImportPath": "golang.org/x/sys",
-			"Rev": "95c657629925"
+			"Rev": "3b5209105503"
 		},
 		{
 			"ImportPath": "golang.org/x/text",
-			"Rev": "b19bf474d317"
+			"Rev": "e6919f6577db"
+		},
+		{
+			"ImportPath": "golang.org/x/tools",
+			"Rev": "aa82965741a9"
 		},
 		{
 			"ImportPath": "gopkg.in/check.v1",
