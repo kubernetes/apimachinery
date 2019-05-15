@@ -39,6 +39,10 @@
 			"Rev": "v1.2.0"
 		},
 		{
+			"ImportPath": "github.com/google/go-cmp",
+			"Rev": "v0.3.0"
+		},
+		{
 			"ImportPath": "github.com/google/gofuzz",
 			"Rev": "24818f796faf"
 		},
