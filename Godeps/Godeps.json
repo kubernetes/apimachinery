@@ -140,7 +140,7 @@
 		},
 		{
 			"ImportPath": "k8s.io/klog",
-			"Rev": "v0.3.2"
+			"Rev": "v0.3.1"
 		},
 		{
 			"ImportPath": "k8s.io/kube-openapi",
