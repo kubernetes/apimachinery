@@ -48,7 +48,7 @@
 		},
 		{
 			"ImportPath": "github.com/google/uuid",
-			"Rev": "v1.0.0"
+			"Rev": "v1.1.1"
 		},
 		{
 			"ImportPath": "github.com/googleapis/gnostic",
