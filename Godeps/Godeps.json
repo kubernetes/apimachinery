@@ -76,7 +76,7 @@
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf",
-			"Rev": "v1.2.0"
+			"Rev": "v1.3.1"
 		},
 		{
 			"ImportPath": "github.com/google/go-cmp",
@@ -96,7 +96,7 @@
 		},
 		{
 			"ImportPath": "github.com/hashicorp/golang-lru",
-			"Rev": "v0.5.0"
+			"Rev": "v0.5.1"
 		},
 		{
 			"ImportPath": "github.com/hpcloud/tail",
