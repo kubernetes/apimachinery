@@ -220,7 +220,7 @@
 		},
 		{
 			"ImportPath": "k8s.io/kube-openapi",
-			"Rev": "33be087ad058"
+			"Rev": "743ec37842bf"
 		},
 		{
 			"ImportPath": "sigs.k8s.io/structured-merge-diff",
