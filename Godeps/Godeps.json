@@ -136,7 +136,7 @@
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "v2.2.1"
+			"Rev": "v2.2.4"
 		},
 		{
 			"ImportPath": "k8s.io/klog",
