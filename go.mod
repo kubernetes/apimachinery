@@ -21,7 +21,7 @@ require (
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/modern-go/reflect2 v1.0.1
 	github.com/mxk/go-flowrate v0.0.0-20140419014527-cca7078d478f
-	github.com/onsi/ginkgo v1.10.1 // indirect
+	github.com/onsi/ginkgo v1.10.4-0.20191206104214-f66e896ca772 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.4.0
@@ -39,4 +39,5 @@ require (
 replace (
 	golang.org/x/sys => golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // pinned to release-branch.go1.13
 	golang.org/x/tools => golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7 // pinned to release-branch.go1.13
+	k8s.io/apimachinery => ../apimachinery
 )
