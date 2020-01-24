@@ -13,7 +13,7 @@ require (
 	github.com/golang/groupcache v0.0.0-20160516000752-02826c3e7903
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-cmp v0.3.0
-	github.com/google/gofuzz v1.1.0
+	github.com/google/gofuzz v1.0.0
 	github.com/google/uuid v1.1.1
 	github.com/googleapis/gnostic v0.1.0
 	github.com/hashicorp/golang-lru v0.5.1
@@ -26,7 +26,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.4.0
 	golang.org/x/net v0.0.0-20191004110552-13f9640d40b9
-	golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456 // indirect
+	golang.org/x/sys v0.0.0-20191022100944-742c48ecaeb7 // indirect
 	golang.org/x/text v0.3.2 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/inf.v0 v0.9.1
@@ -39,4 +39,5 @@ require (
 replace (
 	golang.org/x/sys => golang.org/x/sys v0.0.0-20190813064441-fde4db37ae7a // pinned to release-branch.go1.13
 	golang.org/x/tools => golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7 // pinned to release-branch.go1.13
+	k8s.io/apimachinery => ../apimachinery
 )
