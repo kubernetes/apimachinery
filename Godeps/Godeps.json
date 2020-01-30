@@ -84,7 +84,7 @@
 		},
 		{
 			"ImportPath": "github.com/google/gofuzz",
-			"Rev": "v1.0.0"
+			"Rev": "v1.1.0"
 		},
 		{
 			"ImportPath": "github.com/google/uuid",
