@@ -76,7 +76,7 @@
 		},
 		{
 			"ImportPath": "github.com/golang/groupcache",
-			"Rev": "5b532d6fd5ef"
+			"Rev": "215e87163ea7"
 		},
 		{
 			"ImportPath": "github.com/golang/protobuf",
@@ -224,15 +224,15 @@
 		},
 		{
 			"ImportPath": "k8s.io/gengo",
-			"Rev": "0689ccc1d7d6"
+			"Rev": "3a45101e95ac"
 		},
 		{
-			"ImportPath": "k8s.io/klog",
-			"Rev": "v1.0.0"
+			"ImportPath": "k8s.io/klog/v2",
+			"Rev": "v2.0.0"
 		},
 		{
 			"ImportPath": "k8s.io/kube-openapi",
-			"Rev": "e1beb1bd0f35"
+			"Rev": "656914f816f9"
 		},
 		{
 			"ImportPath": "sigs.k8s.io/structured-merge-diff/v3",
