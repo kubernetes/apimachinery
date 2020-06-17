@@ -40,7 +40,7 @@
 		},
 		{
 			"ImportPath": "github.com/evanphx/json-patch",
-			"Rev": "v4.2.0"
+			"Rev": "e83c0a1c26c8"
 		},
 		{
 			"ImportPath": "github.com/fsnotify/fsnotify",
@@ -157,6 +157,10 @@
 		{
 			"ImportPath": "github.com/onsi/gomega",
 			"Rev": "v1.7.0"
+		},
+		{
+			"ImportPath": "github.com/pkg/errors",
+			"Rev": "v0.9.1"
 		},
 		{
 			"ImportPath": "github.com/pmezard/go-difflib",
