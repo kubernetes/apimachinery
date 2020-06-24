@@ -188,11 +188,11 @@
 		},
 		{
 			"ImportPath": "golang.org/x/sync",
-			"Rev": "112230192c58"
+			"Rev": "1d60e4601c6f"
 		},
 		{
 			"ImportPath": "golang.org/x/sys",
-			"Rev": "fde4db37ae7a"
+			"Rev": "915c9c3d4ccf"
 		},
 		{
 			"ImportPath": "golang.org/x/text",
@@ -200,7 +200,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/tools",
-			"Rev": "65e3620a7ae7"
+			"Rev": "6c7e314b6563"
 		},
 		{
 			"ImportPath": "golang.org/x/xerrors",
