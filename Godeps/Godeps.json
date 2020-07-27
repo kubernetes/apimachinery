@@ -216,7 +216,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/crypto",
-			"Rev": "c2843e01d9a2"
+			"Rev": "75b288015ac9"
 		},
 		{
 			"ImportPath": "golang.org/x/exp",
@@ -228,7 +228,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/net",
-			"Rev": "d3edc9973b7e"
+			"Rev": "ab3426394381"
 		},
 		{
 			"ImportPath": "golang.org/x/oauth2",
