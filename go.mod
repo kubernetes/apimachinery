@@ -8,7 +8,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1
 	github.com/docker/spdystream v0.0.0-20160310174837-449fdfce4d96
 	github.com/elazarl/goproxy v0.0.0-20170405201442-c4fc26588b6e
-	github.com/evanphx/json-patch v4.2.0+incompatible
+	github.com/evanphx/json-patch v0.0.0-20200808040245-162e5629780b
 	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d
 	github.com/golang/groupcache v0.0.0-20160516000752-02826c3e7903
 	github.com/golang/protobuf v1.3.1
@@ -36,4 +36,7 @@ require (
 	sigs.k8s.io/yaml v1.1.0
 )
 
-replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7
+replace (
+	golang.org/x/tools => golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7
+	k8s.io/apimachinery => ../apimachinery
+)
