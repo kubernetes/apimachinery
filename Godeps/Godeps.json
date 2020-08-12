@@ -36,7 +36,7 @@
 		},
 		{
 			"ImportPath": "github.com/evanphx/json-patch",
-			"Rev": "v4.2.0"
+			"Rev": "162e5629780b"
 		},
 		{
 			"ImportPath": "github.com/fsnotify/fsnotify",
@@ -103,6 +103,10 @@
 			"Rev": "v1.0.0"
 		},
 		{
+			"ImportPath": "github.com/jessevdk/go-flags",
+			"Rev": "v1.4.0"
+		},
+		{
 			"ImportPath": "github.com/json-iterator/go",
 			"Rev": "v1.1.8"
 		},
@@ -153,6 +157,10 @@
 		{
 			"ImportPath": "github.com/onsi/gomega",
 			"Rev": "v1.7.0"
+		},
+		{
+			"ImportPath": "github.com/pkg/errors",
+			"Rev": "v0.8.1"
 		},
 		{
 			"ImportPath": "github.com/pmezard/go-difflib",
