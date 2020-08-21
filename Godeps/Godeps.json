@@ -64,7 +64,7 @@
 		},
 		{
 			"ImportPath": "github.com/evanphx/json-patch",
-			"Rev": "162e5629780b"
+			"Rev": "v4.9.0"
 		},
 		{
 			"ImportPath": "github.com/fsnotify/fsnotify",
@@ -137,10 +137,6 @@
 		{
 			"ImportPath": "github.com/hpcloud/tail",
 			"Rev": "v1.0.0"
-		},
-		{
-			"ImportPath": "github.com/jessevdk/go-flags",
-			"Rev": "v1.4.0"
 		},
 		{
 			"ImportPath": "github.com/json-iterator/go",
