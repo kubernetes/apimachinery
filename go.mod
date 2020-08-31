@@ -37,7 +37,4 @@ require (
 	sigs.k8s.io/yaml v1.1.0
 )
 
-replace (
-	golang.org/x/tools => golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7
-	k8s.io/apimachinery => ../apimachinery
-)
+replace golang.org/x/tools => golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7
