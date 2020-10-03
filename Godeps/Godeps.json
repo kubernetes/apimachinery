@@ -304,11 +304,11 @@
 		},
 		{
 			"ImportPath": "k8s.io/kube-openapi",
-			"Rev": "6aeccd4b50c6"
+			"Rev": "8b5066479488"
 		},
 		{
 			"ImportPath": "sigs.k8s.io/structured-merge-diff/v4",
-			"Rev": "v4.0.1"
+			"Rev": "b3cf1e8ff931"
 		},
 		{
 			"ImportPath": "sigs.k8s.io/yaml",
