@@ -43,10 +43,6 @@
 			"Rev": "v1.1.1"
 		},
 		{
-			"ImportPath": "github.com/docker/spdystream",
-			"Rev": "449fdfce4d96"
-		},
-		{
 			"ImportPath": "github.com/docopt/docopt-go",
 			"Rev": "ee0de3bc6815"
 		},
@@ -135,6 +131,10 @@
 			"Rev": "v0.4.1"
 		},
 		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Rev": "v1.4.2"
+		},
+		{
 			"ImportPath": "github.com/hashicorp/golang-lru",
 			"Rev": "v0.5.1"
 		},
@@ -173,6 +173,10 @@
 		{
 			"ImportPath": "github.com/mitchellh/mapstructure",
 			"Rev": "v1.1.2"
+		},
+		{
+			"ImportPath": "github.com/moby/spdystream",
+			"Rev": "v0.2.0"
 		},
 		{
 			"ImportPath": "github.com/modern-go/concurrent",
