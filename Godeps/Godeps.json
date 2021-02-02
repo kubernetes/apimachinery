@@ -96,7 +96,7 @@
 		},
 		{
 			"ImportPath": "github.com/gogo/protobuf",
-			"Rev": "v1.3.1"
+			"Rev": "v1.3.2"
 		},
 		{
 			"ImportPath": "github.com/golang/glog",
@@ -148,7 +148,7 @@
 		},
 		{
 			"ImportPath": "github.com/kisielk/errcheck",
-			"Rev": "v1.2.0"
+			"Rev": "v1.5.0"
 		},
 		{
 			"ImportPath": "github.com/kisielk/gotool",
@@ -227,6 +227,10 @@
 			"Rev": "v1.6.1"
 		},
 		{
+			"ImportPath": "github.com/yuin/goldmark",
+			"Rev": "v1.2.1"
+		},
+		{
 			"ImportPath": "golang.org/x/crypto",
 			"Rev": "75b288015ac9"
 		},
@@ -239,6 +243,10 @@
 			"Rev": "d0100b6bd8b3"
 		},
 		{
+			"ImportPath": "golang.org/x/mod",
+			"Rev": "v0.3.0"
+		},
+		{
 			"ImportPath": "golang.org/x/net",
 			"Rev": "69a78807bb2b"
 		},
@@ -248,7 +256,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/sync",
-			"Rev": "112230192c58"
+			"Rev": "67f06af15bc9"
 		},
 		{
 			"ImportPath": "golang.org/x/sys",
@@ -260,7 +268,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/tools",
-			"Rev": "5aca471b1d59"
+			"Rev": "113979e3529a"
 		},
 		{
 			"ImportPath": "golang.org/x/xerrors",
