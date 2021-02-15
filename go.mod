@@ -2,7 +2,7 @@
 
 module k8s.io/apimachinery
 
-go 1.15
+go 1.16
 
 require (
 	github.com/davecgh/go-spew v1.1.1
@@ -37,3 +37,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.0.3
 	sigs.k8s.io/yaml v1.2.0
 )
+
+replace k8s.io/apimachinery => ../apimachinery
