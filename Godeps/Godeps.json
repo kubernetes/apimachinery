@@ -71,10 +71,6 @@
 			"Rev": "v1.4.7"
 		},
 		{
-			"ImportPath": "github.com/ghodss/yaml",
-			"Rev": "73d445a93680"
-		},
-		{
 			"ImportPath": "github.com/go-logr/logr",
 			"Rev": "v0.4.0"
 		},
@@ -332,7 +328,7 @@
 		},
 		{
 			"ImportPath": "k8s.io/kube-openapi",
-			"Rev": "d219536bb9fd"
+			"Rev": "591a79e4bda7"
 		},
 		{
 			"ImportPath": "sigs.k8s.io/structured-merge-diff/v4",
