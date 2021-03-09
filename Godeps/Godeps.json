@@ -39,6 +39,10 @@
 			"Rev": "v0.3.4"
 		},
 		{
+			"ImportPath": "github.com/creack/pty",
+			"Rev": "v1.1.9"
+		},
+		{
 			"ImportPath": "github.com/davecgh/go-spew",
 			"Rev": "v1.1.1"
 		},
@@ -160,7 +164,7 @@
 		},
 		{
 			"ImportPath": "github.com/kr/text",
-			"Rev": "v0.1.0"
+			"Rev": "v0.2.0"
 		},
 		{
 			"ImportPath": "github.com/mailru/easyjson",
@@ -189,6 +193,10 @@
 		{
 			"ImportPath": "github.com/mxk/go-flowrate",
 			"Rev": "cca7078d478f"
+		},
+		{
+			"ImportPath": "github.com/niemeyer/pretty",
+			"Rev": "a10e7caefd8e"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
@@ -292,7 +300,7 @@
 		},
 		{
 			"ImportPath": "gopkg.in/check.v1",
-			"Rev": "41f04d3bba15"
+			"Rev": "8fa46927fb4f"
 		},
 		{
 			"ImportPath": "gopkg.in/fsnotify.v1",
@@ -308,7 +316,7 @@
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "v2.2.8"
+			"Rev": "v2.4.0"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v3",
