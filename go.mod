@@ -9,7 +9,7 @@ require (
 	github.com/docker/spdystream v0.0.0-20160310174837-449fdfce4d96
 	github.com/elazarl/goproxy v0.0.0-20180725130230-947c36da3153
 	github.com/evanphx/json-patch v4.9.0+incompatible
-	github.com/gogo/protobuf v1.3.1
+	github.com/gogo/protobuf v1.3.2
 	github.com/golang/groupcache v0.0.0-20160516000752-02826c3e7903
 	github.com/golang/protobuf v1.3.2
 	github.com/google/go-cmp v0.3.0
@@ -41,4 +41,5 @@ replace (
 	golang.org/x/crypto => golang.org/x/crypto v0.0.0-20200220183623-bac4c82f6975
 	golang.org/x/text => golang.org/x/text v0.3.2
 	golang.org/x/tools => golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7 // pinned to release-branch.go1.13
+	k8s.io/apimachinery => ../apimachinery
 )
