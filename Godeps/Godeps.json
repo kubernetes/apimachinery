@@ -176,11 +176,11 @@
 		},
 		{
 			"ImportPath": "golang.org/x/crypto",
-			"Rev": "c2843e01d9a2"
+			"Rev": "bac4c82f6975"
 		},
 		{
 			"ImportPath": "golang.org/x/net",
-			"Rev": "13f9640d40b9"
+			"Rev": "69a78807bb2b"
 		},
 		{
 			"ImportPath": "golang.org/x/sync",
@@ -188,7 +188,7 @@
 		},
 		{
 			"ImportPath": "golang.org/x/sys",
-			"Rev": "fde4db37ae7a"
+			"Rev": "5cba982894dd"
 		},
 		{
 			"ImportPath": "golang.org/x/text",
