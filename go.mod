@@ -33,7 +33,7 @@ require (
 	gopkg.in/yaml.v2 v2.2.8
 	k8s.io/klog v1.0.0
 	k8s.io/kube-openapi v0.0.0-20200410145947-61e04a5be9a6 // release-1.18
-	sigs.k8s.io/structured-merge-diff/v3 v3.0.0
+	sigs.k8s.io/structured-merge-diff/v3 v3.0.1
 	sigs.k8s.io/yaml v1.2.0
 )
 
@@ -41,4 +41,5 @@ replace (
 	golang.org/x/crypto => golang.org/x/crypto v0.0.0-20200220183623-bac4c82f6975
 	golang.org/x/text => golang.org/x/text v0.3.2
 	golang.org/x/tools => golang.org/x/tools v0.0.0-20190821162956-65e3620a7ae7 // pinned to release-branch.go1.13
+	k8s.io/apimachinery => ../apimachinery
 )
