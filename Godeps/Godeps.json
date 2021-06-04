@@ -68,7 +68,7 @@
 		},
 		{
 			"ImportPath": "github.com/evanphx/json-patch",
-			"Rev": "v4.9.0"
+			"Rev": "v4.11.0"
 		},
 		{
 			"ImportPath": "github.com/fsnotify/fsnotify",
