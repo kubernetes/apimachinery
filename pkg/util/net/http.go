@@ -98,6 +98,8 @@ func IsProbableEOF(err error) bool {
 		return true
 	case strings.Contains(strings.ToLower(msg), "use of closed network connection"):
 		return true
+	case strings.Contains(strings.ToLower(msg), "http2: client connection lost"):
+		return true
 	}
 	return false
 }
