@@ -37,5 +37,3 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.1
 	sigs.k8s.io/yaml v1.2.0
 )
-
-replace k8s.io/apimachinery => ../apimachinery
