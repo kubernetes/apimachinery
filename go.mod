@@ -2,7 +2,7 @@
 
 module k8s.io/apimachinery
 
-go 1.21.3
+go 1.21
 
 require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
@@ -54,3 +54,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace k8s.io/apimachinery => ../apimachinery
