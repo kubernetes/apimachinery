@@ -8,7 +8,7 @@ require (
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/davecgh/go-spew v1.1.1
 	github.com/evanphx/json-patch v4.12.0+incompatible
-	github.com/fxamacker/cbor/v2 v2.5.0
+	github.com/fxamacker/cbor/v2 v2.6.0
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/protobuf v1.5.3
 	github.com/google/gnostic-models v0.6.8
@@ -56,3 +56,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace k8s.io/apimachinery => ../apimachinery
