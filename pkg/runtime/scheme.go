@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"sync"
 
 	"k8s.io/apimachinery/pkg/conversion"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -82,6 +83,9 @@ type Scheme struct {
 	// schemeName is the name of this scheme.  If you don't specify a name, the stack of the NewScheme caller will be used.
 	// This is useful for error reporting to indicate the origin of the scheme.
 	schemeName string
+
+	// mutex is used to lock and unlock the maps used to avoid panics
+	mutex sync.RWMutex
 }
 
 // FieldLabelConversionFunc converts a field selector to internal representation.
@@ -98,6 +102,7 @@ func NewScheme() *Scheme {
 		defaulterFuncs:            map[reflect.Type]func(interface{}){},
 		versionPriority:           map[string][]string{},
 		schemeName:                naming.GetNameFromCallsite(internalPackages...),
+		mutex:                     sync.RWMutex{},
 	}
 	s.converter = conversion.NewConverter(nil)
 
@@ -125,7 +130,9 @@ func (s *Scheme) AddUnversionedTypes(version schema.GroupVersion, types ...Objec
 	for _, obj := range types {
 		t := reflect.TypeOf(obj).Elem()
 		gvk := version.WithKind(t.Name())
+		s.mutex.Lock()
 		s.unversionedTypes[t] = gvk
+		s.mutex.Unlock()
 		if old, ok := s.unversionedKinds[gvk.Kind]; ok && t != old {
 			panic(fmt.Sprintf("%v.%v has already been registered as unversioned kind %q - kind name must be unique in scheme %q", old.PkgPath(), old.Name(), gvk, s.schemeName))
 		}
@@ -264,7 +271,9 @@ func (s *Scheme) ObjectKinds(obj Object) ([]schema.GroupVersionKind, bool, error
 	if !ok {
 		return nil, false, NewNotRegisteredErrForType(s.schemeName, t)
 	}
+	s.mutex.Lock()
 	_, unversionedType := s.unversionedTypes[t]
+	s.mutex.Unlock()
 
 	return gvks, unversionedType, nil
 }
@@ -286,7 +295,10 @@ func (s *Scheme) IsUnversioned(obj Object) (bool, bool) {
 	if _, ok := s.typeToGVK[t]; !ok {
 		return false, false
 	}
+
+	s.mutex.Lock()
 	_, ok := s.unversionedTypes[t]
+	s.mutex.Unlock()
 	return ok, true
 }
 
@@ -480,7 +492,10 @@ func (s *Scheme) convertToVersion(copy bool, in Object, target GroupVersioner) (
 	if !ok {
 		// try to see if this type is listed as unversioned (for legacy support)
 		// TODO: when we move to server API versions, we should completely remove the unversioned concept
-		if unversionedKind, ok := s.unversionedTypes[t]; ok {
+		s.mutex.Lock()
+		unversionedKind, ok := s.unversionedTypes[t]
+		s.mutex.Unlock()
+		if ok {
 			if gvk, ok := target.KindForGroupVersionKinds([]schema.GroupVersionKind{unversionedKind}); ok {
 				return copyAndSetTargetKind(copy, in, gvk)
 			}
@@ -497,7 +512,10 @@ func (s *Scheme) convertToVersion(copy bool, in Object, target GroupVersioner) (
 	}
 
 	// type is unversioned, no conversion necessary
-	if unversionedKind, ok := s.unversionedTypes[t]; ok {
+	s.mutex.Lock()
+	unversionedKind, ok := s.unversionedTypes[t]
+	s.mutex.Unlock()
+	if ok {
 		if gvk, ok := target.KindForGroupVersionKinds([]schema.GroupVersionKind{unversionedKind}); ok {
 			return copyAndSetTargetKind(copy, in, gvk)
 		}
