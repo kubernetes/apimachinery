@@ -1,4 +1,4 @@
-//go:build !fieldsv1string
+//go:build fieldsv1string
 
 /*
 Copyright The Kubernetes Authors.
@@ -19,7 +19,8 @@ limitations under the License.
 package v1
 
 import (
-	"bytes"
+	"strings"
+	"unique"
 )
 
 // FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
@@ -37,25 +38,37 @@ import (
 // +protobuf.options.marshal=false
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type FieldsV1 struct {
-	// Raw is the underlying serialization of this object.
-	//
-	// Deprecated: Direct access to this field is deprecated. Use GetRawBytes, GetRawString, SetRawBytes, SetRawString, GetRawReader, NewFieldsV1 instead.
-	Raw []byte `json:"-" protobuf:"bytes,1,opt,name=Raw"`
+	// The zero value of a unique.Handle[string] has an uninitialized underlying pointer.
+	// Calling .Value() on it panics. We must explicitly check for this uninitialized
+	// state (f.handle == unique.Handle[string]{}) across accessors to safely support
+	// uninitialized metav1.FieldsV1{} objects.
+	// See ongoing golang discussion related to this here: https://github.com/golang/go/issues/73344
+	handle unique.Handle[string]
 }
 
 func (f FieldsV1) String() string {
-	return string(f.Raw)
+	if f.handle == (unique.Handle[string]{}) {
+		return ""
+	}
+	return f.handle.Value()
 }
 
 func (f FieldsV1) Equal(f2 FieldsV1) bool {
-	return bytes.Equal(f.Raw, f2.Raw)
+	if f.handle == f2.handle {
+		return true
+	}
+	// An uninitialized FieldsV1 compared to an explicitly empty
+	// FieldsV1 (unique.Make("") will fail the handle check above.
+	// Evaluate string contents directly as well to maintain parity with legacy
+	// bytes.Equal(nil, []byte{}) == true behavior.
+	return f.GetRawString() == f2.GetRawString()
 }
 
 func (f *FieldsV1) GetRawReader() FieldsV1Reader {
-	if f == nil || len(f.Raw) == 0 {
-		return bytes.NewReader(nil)
+	if f == nil || f.handle == (unique.Handle[string]{}) {
+		return strings.NewReader("")
 	}
-	return bytes.NewReader(f.Raw)
+	return strings.NewReader(f.handle.Value())
 }
 
 // GetRawBytes returns the raw bytes.
@@ -63,43 +76,38 @@ func (f *FieldsV1) GetRawReader() FieldsV1Reader {
 // If mutating the underlying bytes is desired, the returned bytes may be mutated and then passed to SetRawBytes().
 // If mutating the underlying bytes is not desired, make a copy of the returned bytes.
 func (f *FieldsV1) GetRawBytes() []byte {
-	if f == nil {
+	if f == nil || f.handle == (unique.Handle[string]{}) {
 		return nil
 	}
-	return f.Raw
+	return []byte(f.handle.Value())
 }
 
 // GetRawString returns the raw data as a string.
 func (f *FieldsV1) GetRawString() string {
-	if f == nil {
+	if f == nil || f.handle == (unique.Handle[string]{}) {
 		return ""
 	}
-	return string(f.Raw)
+	return f.handle.Value()
 }
 
 // SetRawBytes sets the raw bytes. It does not retain the passed-in byte slice.
 func (f *FieldsV1) SetRawBytes(b []byte) {
 	if f != nil {
-		f.Raw = bytes.Clone(b)
+		f.handle = unique.Make(string(b))
 	}
 }
 
 // SetRawString sets the raw data from a string.
 func (f *FieldsV1) SetRawString(s string) {
 	if f != nil {
-		f.Raw = []byte(s)
+		f.handle = unique.Make(s)
 	}
 }
 
 func NewFieldsV1(raw string) *FieldsV1 {
-	return &FieldsV1{Raw: []byte(raw)}
+	return &FieldsV1{handle: unique.Make(raw)}
 }
 
 func (f *FieldsV1) DeepCopyInto(out *FieldsV1) {
 	*out = *f
-	if f.Raw != nil {
-		in, out := &f.Raw, &out.Raw
-		*out = make([]byte, len(*in))
-		copy(*out, *in)
-	}
 }
