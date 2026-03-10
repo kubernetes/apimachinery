@@ -89,6 +89,17 @@ func Minimum[T constraints.Integer](_ context.Context, _ operation.Operation, fl
 	return nil
 }
 
+// Maximum verifies that the specified value is less than or equal to max.
+func Maximum[T constraints.Integer](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T, max T) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if *value > max {
+		return field.ErrorList{field.Invalid(fldPath, *value, content.MaxError(max)).WithOrigin("maximum")}
+	}
+	return nil
+}
+
 // MinLength verifies that the specified value is at least min characters, if non-nil.
 func MinLength[T ~string](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T, min int) field.ErrorList {
 	if value == nil {

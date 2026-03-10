@@ -18,6 +18,7 @@ package validate
 
 import (
 	"context"
+	"fmt"
 	"regexp"
 	"testing"
 
@@ -31,7 +32,7 @@ func TestMaxLength(t *testing.T) {
 		name     string
 		value    string
 		max      int
-		wantErrs field.ErrorList // regex
+		wantErrs field.ErrorList
 	}{{
 		name:     "empty string",
 		value:    "",
@@ -255,12 +256,90 @@ func doTestMinimum[T constraints.Integer](t *testing.T, cases []minimumTestCase[
 	}
 }
 
+func TestMaximum(t *testing.T) {
+	testMaximumPositive[int](t)
+	testMaximumNegative[int](t)
+	testMaximumPositive[int8](t)
+	testMaximumNegative[int8](t)
+	testMaximumPositive[int16](t)
+	testMaximumNegative[int16](t)
+	testMaximumPositive[int32](t)
+	testMaximumNegative[int32](t)
+	testMaximumPositive[int64](t)
+	testMaximumNegative[int64](t)
+
+	testMaximumPositive[uint](t)
+	testMaximumPositive[uint8](t)
+	testMaximumPositive[uint16](t)
+	testMaximumPositive[uint32](t)
+	testMaximumPositive[uint64](t)
+}
+
+type maximumTestCase[T constraints.Integer] struct {
+	max      T
+	value    T
+	wantErrs field.ErrorList
+}
+
+func testMaximumPositive[T constraints.Integer](t *testing.T) {
+	t.Helper()
+	cases := []maximumTestCase[T]{{
+		max:   0,
+		value: 0,
+	}, {
+		max:   0,
+		value: 1,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be less than or equal to").WithOrigin("maximum"),
+		},
+	}, {
+		max:   1,
+		value: 1,
+	}, {
+		max:   1,
+		value: 2,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be less than or equal to").WithOrigin("maximum"),
+		},
+	}}
+	doTestMaximum[T](t, cases)
+}
+
+func testMaximumNegative[T constraints.Signed](t *testing.T) {
+	t.Helper()
+	cases := []maximumTestCase[T]{{
+		max:   -1,
+		value: -1,
+	}, {
+		max:   -2,
+		value: -1,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be less than or equal to").WithOrigin("maximum"),
+		},
+	}}
+
+	doTestMaximum[T](t, cases)
+}
+
+func doTestMaximum[T constraints.Integer](t *testing.T, cases []maximumTestCase[T]) {
+	t.Helper()
+	matcher := field.ErrorMatcher{}.ByOrigin().ByDetailSubstring().ByField().ByType()
+	for _, tc := range cases {
+		name := fmt.Sprintf("%T (%v <= %v)", tc.value, tc.value, tc.max)
+		t.Run(name, func(t *testing.T) {
+			v := tc.value
+			gotErrs := Maximum(context.Background(), operation.Operation{}, field.NewPath("fldpath"), &v, nil, tc.max)
+			matcher.Test(t, tc.wantErrs, gotErrs)
+		})
+	}
+}
+
 func TestMaxBytes(t *testing.T) {
 	cases := []struct {
 		name     string
 		value    string
 		max      int
-		wantErrs field.ErrorList // regex
+		wantErrs field.ErrorList
 	}{{
 		name:     "empty string",
 		value:    "",
