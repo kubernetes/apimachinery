@@ -19,7 +19,6 @@ package validate
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/api/operation"
@@ -166,10 +165,10 @@ func TestMinItems(t *testing.T) {
 
 func TestMaxItems(t *testing.T) {
 	cases := []struct {
-		name  string
-		items int
-		max   int
-		err   string // regex
+		name     string
+		items    int
+		max      int
+		wantErrs field.ErrorList
 	}{{
 		name:  "0 items, max 0",
 		items: 0,
@@ -178,7 +177,9 @@ func TestMaxItems(t *testing.T) {
 		name:  "1 item, max 0",
 		items: 1,
 		max:   0,
-		err:   "fldpath: Too many.*must have at most",
+		wantErrs: field.ErrorList{
+			field.TooMany(field.NewPath("fldpath"), 1, 0).WithOrigin("maxItems"),
+		},
 	}, {
 		name:  "1 item, max 1",
 		items: 1,
@@ -187,35 +188,24 @@ func TestMaxItems(t *testing.T) {
 		name:  "2 items, max 1",
 		items: 2,
 		max:   1,
-		err:   "fldpath: Too many.*must have at most",
+		wantErrs: field.ErrorList{
+			field.TooMany(field.NewPath("fldpath"), 2, 1).WithOrigin("maxItems"),
+		},
 	}, {
 		name:  "0 items, max -1",
 		items: 0,
 		max:   -1,
-		err:   "fldpath: Too many.*too many items",
+		wantErrs: field.ErrorList{
+			field.TooMany(field.NewPath("fldpath"), 0, -1).WithOrigin("maxItems"),
+		},
 	}}
 
+	matcher := field.ErrorMatcher{}.ByOrigin().ByDetailSubstring().ByField().ByType()
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			value := make([]bool, tc.items)
-			result := MaxItems(context.Background(), operation.Operation{}, field.NewPath("fldpath"), value, nil, tc.max)
-			if len(result) > 0 && tc.err == "" {
-				t.Errorf("unexpected failure: %v", fmtErrs(result))
-				return
-			}
-			if len(result) == 0 && tc.err != "" {
-				t.Errorf("unexpected success: expected %q", tc.err)
-				return
-			}
-			if len(result) > 0 {
-				if len(result) > 1 {
-					t.Errorf("unexepected multi-error: %v", fmtErrs(result))
-					return
-				}
-				if re := regexp.MustCompile(tc.err); !re.MatchString(result[0].Error()) {
-					t.Errorf("wrong error\nexpected: %q\n     got: %v", tc.err, fmtErrs(result))
-				}
-			}
+			gotErrs := MaxItems(context.Background(), operation.Operation{}, field.NewPath("fldpath"), value, nil, tc.max)
+			matcher.Test(t, tc.wantErrs, gotErrs)
 		})
 	}
 }
