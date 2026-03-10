@@ -112,7 +112,7 @@ func (e *Error) ErrorBody() string {
 	case ErrorTypeRequired, ErrorTypeForbidden, ErrorTypeTooLong, ErrorTypeTooShort, ErrorTypeInternal:
 		s = e.Type.String()
 	case ErrorTypeInvalid, ErrorTypeTypeInvalid, ErrorTypeNotSupported,
-		ErrorTypeNotFound, ErrorTypeDuplicate, ErrorTypeTooMany:
+		ErrorTypeNotFound, ErrorTypeDuplicate, ErrorTypeTooMany, ErrorTypeTooFew:
 		if e.BadValue == omitValue {
 			s = e.Type.String()
 			break
@@ -201,6 +201,10 @@ const (
 	// report that a given list has too many items. This is similar to FieldValueTooLong,
 	// but the error indicates quantity instead of length.
 	ErrorTypeTooMany ErrorType = "FieldValueTooMany"
+	// ErrorTypeTooFew is used to report "too few". This is used to
+	// report that a given list has too few items. This is similar to FieldValueTooLong,
+	// but the error indicates quantity instead of length.
+	ErrorTypeTooFew ErrorType = "FieldValueTooFew"
 	// ErrorTypeInternal is used to report other errors that are not related
 	// to user input.  See InternalError().
 	ErrorTypeInternal ErrorType = "InternalError"
@@ -230,6 +234,8 @@ func (t ErrorType) String() string {
 		return "Too long"
 	case ErrorTypeTooMany:
 		return "Too many"
+	case ErrorTypeTooFew:
+		return "Too few"
 	case ErrorTypeInternal:
 		return "Internal error"
 	case ErrorTypeTypeInvalid:
@@ -582,4 +588,28 @@ func (list ErrorList) RemoveCoveredByDeclarative() ErrorList {
 		}
 	}
 	return newList
+}
+
+// TooFew returns a *Error indicating "too few". This is used to
+// report that a given list has too few items. This is similar to TooLong,
+// but the returned error indicates quantity instead of length.
+func TooFew(field *Path, actualQuantity, minQuantity int) *Error {
+	var msg string
+
+	if minQuantity >= 0 {
+		is := "items"
+		if minQuantity == 1 {
+			is = "item"
+		}
+		msg = fmt.Sprintf("must have at least %d %s", minQuantity, is)
+	} else {
+		msg = "has too few items"
+	}
+
+	return &Error{
+		Type:     ErrorTypeTooFew,
+		Field:    field.String(),
+		BadValue: actualQuantity,
+		Detail:   msg,
+	}
 }
