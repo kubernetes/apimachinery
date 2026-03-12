@@ -18,7 +18,7 @@ package validate
 
 import (
 	"context"
-	"regexp"
+	"fmt"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/api/operation"
@@ -31,7 +31,7 @@ func TestMaxLength(t *testing.T) {
 		name     string
 		value    string
 		max      int
-		wantErrs field.ErrorList // regex
+		wantErrs field.ErrorList
 	}{{
 		name:     "empty string",
 		value:    "",
@@ -115,12 +115,60 @@ func TestMaxLength(t *testing.T) {
 	}
 }
 
+func TestMinItems(t *testing.T) {
+	cases := []struct {
+		name     string
+		items    int
+		min      int
+		wantErrs field.ErrorList
+	}{{
+		name:  "0 items, min 0",
+		items: 0,
+		min:   0,
+	}, {
+		name:  "1 item, min 0",
+		items: 1,
+		min:   0,
+	}, {
+		name:  "1 item, min 1",
+		items: 1,
+		min:   1,
+	}, {
+		name:  "0 items, min 1",
+		items: 0,
+		min:   1,
+		wantErrs: field.ErrorList{
+			field.TooFew(field.NewPath("fldpath"), 0, 1).WithOrigin("minItems"),
+		},
+	}, {
+		name:  "1 item, min 2",
+		items: 1,
+		min:   2,
+		wantErrs: field.ErrorList{
+			field.TooFew(field.NewPath("fldpath"), 1, 2).WithOrigin("minItems"),
+		},
+	}, {
+		name:  "0 items, min -1",
+		items: 0,
+		min:   -1,
+	}}
+
+	matcher := field.ErrorMatcher{}.ByOrigin().ByDetailSubstring().ByField().ByType()
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			value := make([]bool, tc.items)
+			gotErrs := MinItems(context.Background(), operation.Operation{}, field.NewPath("fldpath"), value, nil, tc.min)
+			matcher.Test(t, tc.wantErrs, gotErrs)
+		})
+	}
+}
+
 func TestMaxItems(t *testing.T) {
 	cases := []struct {
-		name  string
-		items int
-		max   int
-		err   string // regex
+		name     string
+		items    int
+		max      int
+		wantErrs field.ErrorList
 	}{{
 		name:  "0 items, max 0",
 		items: 0,
@@ -129,7 +177,9 @@ func TestMaxItems(t *testing.T) {
 		name:  "1 item, max 0",
 		items: 1,
 		max:   0,
-		err:   "fldpath: Too many.*must have at most",
+		wantErrs: field.ErrorList{
+			field.TooMany(field.NewPath("fldpath"), 1, 0).WithOrigin("maxItems"),
+		},
 	}, {
 		name:  "1 item, max 1",
 		items: 1,
@@ -138,35 +188,24 @@ func TestMaxItems(t *testing.T) {
 		name:  "2 items, max 1",
 		items: 2,
 		max:   1,
-		err:   "fldpath: Too many.*must have at most",
+		wantErrs: field.ErrorList{
+			field.TooMany(field.NewPath("fldpath"), 2, 1).WithOrigin("maxItems"),
+		},
 	}, {
 		name:  "0 items, max -1",
 		items: 0,
 		max:   -1,
-		err:   "fldpath: Too many.*too many items",
+		wantErrs: field.ErrorList{
+			field.TooMany(field.NewPath("fldpath"), 0, -1).WithOrigin("maxItems"),
+		},
 	}}
 
+	matcher := field.ErrorMatcher{}.ByOrigin().ByDetailSubstring().ByField().ByType()
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			value := make([]bool, tc.items)
-			result := MaxItems(context.Background(), operation.Operation{}, field.NewPath("fldpath"), value, nil, tc.max)
-			if len(result) > 0 && tc.err == "" {
-				t.Errorf("unexpected failure: %v", fmtErrs(result))
-				return
-			}
-			if len(result) == 0 && tc.err != "" {
-				t.Errorf("unexpected success: expected %q", tc.err)
-				return
-			}
-			if len(result) > 0 {
-				if len(result) > 1 {
-					t.Errorf("unexepected multi-error: %v", fmtErrs(result))
-					return
-				}
-				if re := regexp.MustCompile(tc.err); !re.MatchString(result[0].Error()) {
-					t.Errorf("wrong error\nexpected: %q\n     got: %v", tc.err, fmtErrs(result))
-				}
-			}
+			gotErrs := MaxItems(context.Background(), operation.Operation{}, field.NewPath("fldpath"), value, nil, tc.max)
+			matcher.Test(t, tc.wantErrs, gotErrs)
 		})
 	}
 }
@@ -191,27 +230,31 @@ func TestMinimum(t *testing.T) {
 }
 
 type minimumTestCase[T constraints.Integer] struct {
-	value T
-	min   T
-	err   string // regex
+	min      T
+	value    T
+	wantErrs field.ErrorList
 }
 
 func testMinimumPositive[T constraints.Integer](t *testing.T) {
 	t.Helper()
 	cases := []minimumTestCase[T]{{
-		value: 0,
 		min:   0,
-	}, {
 		value: 0,
-		min:   1,
-		err:   "fldpath: Invalid value.*must be greater than or equal to",
 	}, {
-		value: 1,
 		min:   1,
+		value: 0,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be greater than or equal to").WithOrigin("minimum"),
+		},
 	}, {
+		min:   1,
 		value: 1,
+	}, {
 		min:   2,
-		err:   "fldpath: Invalid value.*must be greater than or equal to",
+		value: 1,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be greater than or equal to").WithOrigin("minimum"),
+		},
 	}}
 	doTestMinimum[T](t, cases)
 }
@@ -219,12 +262,14 @@ func testMinimumPositive[T constraints.Integer](t *testing.T) {
 func testMinimumNegative[T constraints.Signed](t *testing.T) {
 	t.Helper()
 	cases := []minimumTestCase[T]{{
+		min:   -1,
 		value: -1,
-		min:   -1,
 	}, {
-		value: -2,
 		min:   -1,
-		err:   "fldpath: Invalid value.*must be greater than or equal to",
+		value: -2,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be greater than or equal to").WithOrigin("minimum"),
+		},
 	}}
 
 	doTestMinimum[T](t, cases)
@@ -232,26 +277,92 @@ func testMinimumNegative[T constraints.Signed](t *testing.T) {
 
 func doTestMinimum[T constraints.Integer](t *testing.T, cases []minimumTestCase[T]) {
 	t.Helper()
-	for i, tc := range cases {
-		v := tc.value
-		result := Minimum(context.Background(), operation.Operation{}, field.NewPath("fldpath"), &v, nil, tc.min)
-		if len(result) > 0 && tc.err == "" {
-			t.Errorf("case %d: unexpected failure: %v", i, fmtErrs(result))
-			continue
-		}
-		if len(result) == 0 && tc.err != "" {
-			t.Errorf("case %d: unexpected success: expected %q", i, tc.err)
-			continue
-		}
-		if len(result) > 0 {
-			if len(result) > 1 {
-				t.Errorf("case %d: unexepected multi-error: %v", i, fmtErrs(result))
-				continue
-			}
-			if re := regexp.MustCompile(tc.err); !re.MatchString(result[0].Error()) {
-				t.Errorf("case %d: wrong error\nexpected: %q\n     got: %v", i, tc.err, fmtErrs(result))
-			}
-		}
+	matcher := field.ErrorMatcher{}.ByOrigin().ByDetailSubstring().ByField().ByType()
+	for _, tc := range cases {
+		name := fmt.Sprintf("%T (%v >= %v)", tc.value, tc.value, tc.min)
+		t.Run(name, func(t *testing.T) {
+			v := tc.value
+			gotErrs := Minimum(context.Background(), operation.Operation{}, field.NewPath("fldpath"), &v, nil, tc.min)
+			matcher.Test(t, tc.wantErrs, gotErrs)
+		})
+	}
+}
+
+func TestMaximum(t *testing.T) {
+	testMaximumPositive[int](t)
+	testMaximumNegative[int](t)
+	testMaximumPositive[int8](t)
+	testMaximumNegative[int8](t)
+	testMaximumPositive[int16](t)
+	testMaximumNegative[int16](t)
+	testMaximumPositive[int32](t)
+	testMaximumNegative[int32](t)
+	testMaximumPositive[int64](t)
+	testMaximumNegative[int64](t)
+
+	testMaximumPositive[uint](t)
+	testMaximumPositive[uint8](t)
+	testMaximumPositive[uint16](t)
+	testMaximumPositive[uint32](t)
+	testMaximumPositive[uint64](t)
+}
+
+type maximumTestCase[T constraints.Integer] struct {
+	max      T
+	value    T
+	wantErrs field.ErrorList
+}
+
+func testMaximumPositive[T constraints.Integer](t *testing.T) {
+	t.Helper()
+	cases := []maximumTestCase[T]{{
+		max:   0,
+		value: 0,
+	}, {
+		max:   0,
+		value: 1,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be less than or equal to").WithOrigin("maximum"),
+		},
+	}, {
+		max:   1,
+		value: 1,
+	}, {
+		max:   1,
+		value: 2,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be less than or equal to").WithOrigin("maximum"),
+		},
+	}}
+	doTestMaximum[T](t, cases)
+}
+
+func testMaximumNegative[T constraints.Signed](t *testing.T) {
+	t.Helper()
+	cases := []maximumTestCase[T]{{
+		max:   -1,
+		value: -1,
+	}, {
+		max:   -2,
+		value: -1,
+		wantErrs: field.ErrorList{
+			field.Invalid(field.NewPath("fldpath"), nil, "must be less than or equal to").WithOrigin("maximum"),
+		},
+	}}
+
+	doTestMaximum[T](t, cases)
+}
+
+func doTestMaximum[T constraints.Integer](t *testing.T, cases []maximumTestCase[T]) {
+	t.Helper()
+	matcher := field.ErrorMatcher{}.ByOrigin().ByDetailSubstring().ByField().ByType()
+	for _, tc := range cases {
+		name := fmt.Sprintf("%T (%v <= %v)", tc.value, tc.value, tc.max)
+		t.Run(name, func(t *testing.T) {
+			v := tc.value
+			gotErrs := Maximum(context.Background(), operation.Operation{}, field.NewPath("fldpath"), &v, nil, tc.max)
+			matcher.Test(t, tc.wantErrs, gotErrs)
+		})
 	}
 }
 
@@ -260,7 +371,7 @@ func TestMaxBytes(t *testing.T) {
 		name     string
 		value    string
 		max      int
-		wantErrs field.ErrorList // regex
+		wantErrs field.ErrorList
 	}{{
 		name:     "empty string",
 		value:    "",

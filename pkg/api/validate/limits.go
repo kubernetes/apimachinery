@@ -78,6 +78,14 @@ func MaxItems[T any](_ context.Context, _ operation.Operation, fldPath *field.Pa
 	return nil
 }
 
+// MinItems verifies that the specified slice is not shorter than min items.
+func MinItems[T any](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ []T, min int) field.ErrorList {
+	if len(value) < min {
+		return field.ErrorList{field.TooFew(fldPath, len(value), min).WithOrigin("minItems")}
+	}
+	return nil
+}
+
 // Minimum verifies that the specified value is greater than or equal to min.
 func Minimum[T constraints.Integer](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T, min T) field.ErrorList {
 	if value == nil {
@@ -85,6 +93,17 @@ func Minimum[T constraints.Integer](_ context.Context, _ operation.Operation, fl
 	}
 	if *value < min {
 		return field.ErrorList{field.Invalid(fldPath, *value, content.MinError(min)).WithOrigin("minimum")}
+	}
+	return nil
+}
+
+// Maximum verifies that the specified value is less than or equal to max.
+func Maximum[T constraints.Integer](_ context.Context, _ operation.Operation, fldPath *field.Path, value, _ *T, max T) field.ErrorList {
+	if value == nil {
+		return nil
+	}
+	if *value > max {
+		return field.ErrorList{field.Invalid(fldPath, *value, content.MaxError(max)).WithOrigin("maximum")}
 	}
 	return nil
 }
