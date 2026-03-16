@@ -17,43 +17,14 @@ limitations under the License.
 package internalversion
 
 import (
-	"fmt"
-
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/conversion"
-	"k8s.io/apimachinery/pkg/sharding"
 )
 
-// Convert_v1_ListOptions_To_internalversion_ListOptions handles conversion from
-// the wire-format v1.ListOptions to the internal ListOptions, including shard
-// selector parsing.
 func Convert_v1_ListOptions_To_internalversion_ListOptions(in *v1.ListOptions, out *ListOptions, s conversion.Scope) error {
-	if err := autoConvert_v1_ListOptions_To_internalversion_ListOptions(in, out, s); err != nil {
-		return err
-	}
-
-	// Parse the new shardSelector field into a ShardSelector if set.
-	if in.ShardSelector != "" {
-		sel, err := sharding.Parse(in.ShardSelector)
-		if err != nil {
-			return fmt.Errorf("invalid shard selector: %w", err)
-		}
-		out.ShardSelector = sel
-	}
-
-	return nil
+	return autoConvert_v1_ListOptions_To_internalversion_ListOptions(in, out, s)
 }
 
-// Convert_internalversion_ListOptions_To_v1_ListOptions handles conversion from
-// internal ListOptions to the wire-format v1.ListOptions.
 func Convert_internalversion_ListOptions_To_v1_ListOptions(in *ListOptions, out *v1.ListOptions, s conversion.Scope) error {
-	if err := autoConvert_internalversion_ListOptions_To_v1_ListOptions(in, out, s); err != nil {
-		return err
-	}
-
-	if in.ShardSelector != nil && !in.ShardSelector.Empty() {
-		out.ShardSelector = in.ShardSelector.String()
-	}
-
-	return nil
+	return autoConvert_internalversion_ListOptions_To_v1_ListOptions(in, out, s)
 }

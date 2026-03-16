@@ -66,26 +66,34 @@ func (s *shardSelector) Matches(obj runtime.Object) (bool, error) {
 	if len(s.requirements) == 0 {
 		return true, nil
 	}
-	// All requirements share the same key (enforced by the parser),
-	// so resolve the field value and compute the hash once.
-	value, err := ResolveFieldValue(obj, s.requirements[0].Key)
+	// All requirements must share the same key so we resolve the field value
+	// and compute the hash once. The parser enforces this, but we verify here
+	// to guard against selectors constructed through other means.
+	key := s.requirements[0].Key
+	for _, req := range s.requirements[1:] {
+		if req.Key != key {
+			return false, fmt.Errorf("inconsistent shard keys: %q vs %q", key, req.Key)
+		}
+	}
+
+	value, err := ResolveFieldValue(obj, key)
 	if err != nil {
 		return false, err
 	}
 	hash := "0x" + HashField(value)
 
 	for _, req := range s.requirements {
-		if !hexLess(hash, req.Start) && hexLess(hash, req.End) {
+		if !HexLess(hash, req.Start) && HexLess(hash, req.End) {
 			return true, nil
 		}
 	}
 	return false, nil
 }
 
-// hexLess compares two lowercase hex strings numerically.
-// It handles strings of different lengths by treating shorter strings
-// as having smaller magnitude (fewer digits = smaller number).
-func hexLess(a, b string) bool {
+// HexLess compares two 0x-prefixed lowercase hex strings numerically.
+// Both values must be normalized to 16 hex digits (e.g. "0x0000000000000000"),
+// except for the special upper bound "0x10000000000000000" (2^64) which has 17.
+func HexLess(a, b string) bool {
 	if len(a) != len(b) {
 		return len(a) < len(b)
 	}
@@ -117,6 +125,7 @@ func (s *shardSelector) DeepCopySelector() Selector {
 }
 
 // NewSelector creates a Selector from the given requirements.
+// All requirements must use the same Key; this is validated at match time.
 // If no requirements are provided, returns Everything().
 func NewSelector(reqs ...ShardRangeRequirement) Selector {
 	if len(reqs) == 0 {

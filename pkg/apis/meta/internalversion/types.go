@@ -21,7 +21,6 @@ import (
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/sharding"
 )
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
@@ -91,8 +90,10 @@ type ListOptions struct {
 	// compatibility reasons) and to false otherwise.
 	SendInitialEvents *bool
 
-	// ShardSelector is the parsed shard selector from the request.
-	ShardSelector sharding.Selector
+	// ShardSelector is the raw shard selector string from the request.
+	// Parsing is deferred to the apiserver storage layer where the CEL
+	// parser dependency is available.
+	ShardSelector string
 }
 
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
