@@ -19,6 +19,7 @@ package validate
 import (
 	"context"
 	"fmt"
+	"reflect"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/api/operation"
@@ -106,9 +107,10 @@ func DiscriminatedUnion[T any, D ~string](_ context.Context, op operation.Operat
 					len(isSetFns), len(union.members))),
 		}
 	}
+	hasOldValue := !reflect.ValueOf(oldObj).IsNil()
 	var changed bool
 	discriminatorValue := discriminatorExtractor(obj)
-	if op.Type == operation.Update {
+	if op.Type == operation.Update && hasOldValue {
 		oldDiscriminatorValue := discriminatorExtractor(oldObj)
 		changed = discriminatorValue != oldDiscriminatorValue
 	}
@@ -117,7 +119,7 @@ func DiscriminatedUnion[T any, D ~string](_ context.Context, op operation.Operat
 		member := union.members[i]
 		isDiscriminatedMember := string(discriminatorValue) == member.discriminatorValue
 		newIsSet := fieldIsSet(obj)
-		if op.Type == operation.Update && !changed {
+		if op.Type == operation.Update && hasOldValue && !changed {
 			oldIsSet := fieldIsSet(oldObj)
 			changed = changed || newIsSet != oldIsSet
 		}
@@ -131,7 +133,7 @@ func DiscriminatedUnion[T any, D ~string](_ context.Context, op operation.Operat
 	}
 	// If the union discriminator and membership is unchanged, we don't need to
 	// re-validate.
-	if op.Type == operation.Update && !changed {
+	if op.Type == operation.Update && hasOldValue && !changed {
 		return nil
 	}
 	return errs.WithOrigin("union")
@@ -195,11 +197,12 @@ func unionValidate[T any](op operation.Operation, fldPath *field.Path,
 		}
 	}
 
+	hasOldValue := !reflect.ValueOf(oldObj).IsNil()
 	var specifiedFields []string
 	var changed bool
 	for i, fieldIsSet := range isSetFns {
 		newIsSet := fieldIsSet(obj)
-		if op.Type == operation.Update && !changed {
+		if op.Type == operation.Update && hasOldValue && !changed {
 			oldIsSet := fieldIsSet(oldObj)
 			changed = changed || newIsSet != oldIsSet
 		}
@@ -209,7 +212,7 @@ func unionValidate[T any](op operation.Operation, fldPath *field.Path,
 	}
 
 	// If the union membership is unchanged, we don't need to re-validate.
-	if op.Type == operation.Update && !changed {
+	if op.Type == operation.Update && hasOldValue && !changed {
 		return nil
 	}
 

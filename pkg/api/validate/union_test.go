@@ -186,9 +186,12 @@ func TestUnionRatcheting(t *testing.T) {
 		expected  field.ErrorList
 	}{
 		{
-			name:      "both nil",
+			name:      "old nil - no ratcheting",
 			oldStruct: nil,
-			newStruct: nil,
+			newStruct: &testStruct{},
+			expected: field.ErrorList{
+				field.Invalid(nil, "", "must specify one of: `m1`, `m2`"),
+			}.WithOrigin("union"),
 		},
 		{
 			name:      "both empty struct",
