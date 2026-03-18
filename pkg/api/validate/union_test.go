@@ -67,18 +67,34 @@ func TestUnion(t *testing.T) {
 				members = append(members, NewUnionMember(f))
 			}
 
-			// Create mock extractors that return predefined values instead of
-			// actually extracting from the object.
-			extractors := make([]ExtractorFn[*testMember, bool], len(tc.fieldValues))
-			for i, val := range tc.fieldValues {
-				extractors[i] = func(_ *testMember) bool { return val }
-			}
+			t.Run("pointer", func(t *testing.T) {
+				// Create mock extractors that return predefined values instead of
+				// actually extracting from the object.
+				extractors := make([]ExtractorFn[*testMember, bool], len(tc.fieldValues))
+				for i, val := range tc.fieldValues {
+					extractors[i] = func(_ *testMember) bool { return val }
+				}
 
-			got := Union(context.Background(), operation.Operation{}, nil, &testMember{}, nil,
-				NewUnionMembership(members...), extractors...)
-			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf("got %v want %v", got, tc.expected)
-			}
+				got := Union(context.Background(), operation.Operation{}, nil, &testMember{}, nil,
+					NewUnionMembership(members...), extractors...)
+				if !reflect.DeepEqual(got, tc.expected) {
+					t.Errorf("got %v want %v", got, tc.expected)
+				}
+			})
+			t.Run("value", func(t *testing.T) {
+				// Create mock extractors that return predefined values instead of
+				// actually extracting from the object.
+				extractors := make([]ExtractorFn[testMember, bool], len(tc.fieldValues))
+				for i, val := range tc.fieldValues {
+					extractors[i] = func(_ testMember) bool { return val }
+				}
+
+				got := Union(context.Background(), operation.Operation{}, nil, testMember{}, testMember{},
+					NewUnionMembership(members...), extractors...)
+				if !reflect.DeepEqual(got, tc.expected) {
+					t.Errorf("got %v want %v", got, tc.expected)
+				}
+			})
 		})
 	}
 }
@@ -131,26 +147,44 @@ func TestDiscriminatedUnion(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
+		members := []UnionMember{}
+		for _, f := range tc.fields {
+			members = append(members, NewDiscriminatedUnionMember(f[0], f[1]))
+		}
+
 		t.Run(tc.name, func(t *testing.T) {
-			members := []UnionMember{}
-			for _, f := range tc.fields {
-				members = append(members, NewDiscriminatedUnionMember(f[0], f[1]))
-			}
+			t.Run("pointer", func(t *testing.T) {
+				discriminatorExtractor := func(_ *testMember) string { return tc.discriminatorValue }
 
-			discriminatorExtractor := func(_ *testMember) string { return tc.discriminatorValue }
+				// Create mock extractors that return predefined values instead of
+				// actually extracting from the object.
+				extractors := make([]ExtractorFn[*testMember, bool], len(tc.fieldValues))
+				for i, val := range tc.fieldValues {
+					extractors[i] = func(_ *testMember) bool { return val }
+				}
 
-			// Create mock extractors that return predefined values instead of
-			// actually extracting from the object.
-			extractors := make([]ExtractorFn[*testMember, bool], len(tc.fieldValues))
-			for i, val := range tc.fieldValues {
-				extractors[i] = func(_ *testMember) bool { return val }
-			}
+				got := DiscriminatedUnion(context.Background(), operation.Operation{}, nil, &testMember{}, nil,
+					NewDiscriminatedUnionMembership(tc.discriminatorField, members...), discriminatorExtractor, extractors...)
+				if !reflect.DeepEqual(got, tc.expected) {
+					t.Errorf("got %v want %v", got.ToAggregate(), tc.expected.ToAggregate())
+				}
+			})
+			t.Run("value", func(t *testing.T) {
+				discriminatorExtractor := func(_ testMember) string { return tc.discriminatorValue }
 
-			got := DiscriminatedUnion(context.Background(), operation.Operation{}, nil, &testMember{}, nil,
-				NewDiscriminatedUnionMembership(tc.discriminatorField, members...), discriminatorExtractor, extractors...)
-			if !reflect.DeepEqual(got, tc.expected) {
-				t.Errorf("got %v want %v", got.ToAggregate(), tc.expected.ToAggregate())
-			}
+				// Create mock extractors that return predefined values instead of
+				// actually extracting from the object.
+				extractors := make([]ExtractorFn[testMember, bool], len(tc.fieldValues))
+				for i, val := range tc.fieldValues {
+					extractors[i] = func(_ testMember) bool { return val }
+				}
+
+				got := DiscriminatedUnion(context.Background(), operation.Operation{}, nil, testMember{}, testMember{},
+					NewDiscriminatedUnionMembership(tc.discriminatorField, members...), discriminatorExtractor, extractors...)
+				if !reflect.DeepEqual(got, tc.expected) {
+					t.Errorf("got %v want %v", got.ToAggregate(), tc.expected.ToAggregate())
+				}
+			})
 		})
 	}
 }
