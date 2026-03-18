@@ -61,6 +61,10 @@ type UnionValidationOptions struct {
 //		)...)
 //		return errs
 //	}
+//
+// Note that T is "any", rather than "comparable", because union-members can be
+// slices, meaning T might be a struct with a slice, meaning it is not
+// comparable.
 func Union[T any](_ context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj T, union *UnionMembership, isSetFns ...ExtractorFn[T, bool]) field.ErrorList {
 	options := UnionValidationOptions{
 		ErrorForEmpty: func(fldPath *field.Path, allFields []string) *field.Error {
@@ -99,6 +103,10 @@ func Union[T any](_ context.Context, op operation.Operation, fldPath *field.Path
 //
 // It is not an error for the discriminatorValue to be unknown.  That must be
 // validated on its own.
+//
+// Note that T is "any", rather than "comparable", because union-members can be
+// slices, meaning T might be a struct with a slice, meaning it is not
+// comparable.
 func DiscriminatedUnion[T any, D ~string](_ context.Context, op operation.Operation, fldPath *field.Path, obj, oldObj T, union *UnionMembership, discriminatorExtractor ExtractorFn[T, D], isSetFns ...ExtractorFn[T, bool]) (errs field.ErrorList) {
 	if len(union.members) != len(isSetFns) {
 		return field.ErrorList{
@@ -107,10 +115,10 @@ func DiscriminatedUnion[T any, D ~string](_ context.Context, op operation.Operat
 					len(isSetFns), len(union.members))),
 		}
 	}
-	hasOldValue := !reflect.ValueOf(oldObj).IsNil()
+	hasOldValue := !reflect.ValueOf(oldObj).IsZero() // because T is any, rather than comparable
 	var changed bool
 	discriminatorValue := discriminatorExtractor(obj)
-	if op.Type == operation.Update && hasOldValue {
+	if op.Type == operation.Update {
 		oldDiscriminatorValue := discriminatorExtractor(oldObj)
 		changed = discriminatorValue != oldDiscriminatorValue
 	}
@@ -119,7 +127,7 @@ func DiscriminatedUnion[T any, D ~string](_ context.Context, op operation.Operat
 		member := union.members[i]
 		isDiscriminatedMember := string(discriminatorValue) == member.discriminatorValue
 		newIsSet := fieldIsSet(obj)
-		if op.Type == operation.Update && hasOldValue && !changed {
+		if op.Type == operation.Update && !changed {
 			oldIsSet := fieldIsSet(oldObj)
 			changed = changed || newIsSet != oldIsSet
 		}
@@ -197,12 +205,12 @@ func unionValidate[T any](op operation.Operation, fldPath *field.Path,
 		}
 	}
 
-	hasOldValue := !reflect.ValueOf(oldObj).IsNil()
+	hasOldValue := !reflect.ValueOf(oldObj).IsZero() // because T is any, rather than comparable
 	var specifiedFields []string
 	var changed bool
 	for i, fieldIsSet := range isSetFns {
 		newIsSet := fieldIsSet(obj)
-		if op.Type == operation.Update && hasOldValue && !changed {
+		if op.Type == operation.Update && !changed {
 			oldIsSet := fieldIsSet(oldObj)
 			changed = changed || newIsSet != oldIsSet
 		}
