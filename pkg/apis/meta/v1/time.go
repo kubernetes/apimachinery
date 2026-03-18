@@ -209,3 +209,13 @@ func (t Time) MarshalQueryParameter() (string, error) {
 
 	return t.UTC().Format(time.RFC3339), nil
 }
+
+// GoString implements fmt.GoStringer and formats t to be printed in Go source
+// code. It handles nil receivers to prevent nil pointer dereference when the
+// embedded time.Time field is accessed through a nil *Time pointer.
+func (t *Time) GoString() string {
+	if t == nil {
+		return "metav1.NewTime(time.Time{})"
+	}
+	return t.Time.GoString()
+}
