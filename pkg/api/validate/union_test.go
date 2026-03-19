@@ -190,8 +190,10 @@ func TestDiscriminatedUnion(t *testing.T) {
 }
 
 type testStruct struct {
-	M1 *m1 `json:"m1"`
-	M2 *m2 `json:"m2"`
+	M1 *m1               `json:"m1"`
+	M2 *m2               `json:"m2"`
+	M3 []string          `json:"m3"`
+	M4 map[string]string `json:"m4"`
 }
 
 type m1 struct{}
@@ -210,6 +212,18 @@ var extractors = []ExtractorFn[*testStruct, bool]{
 		}
 		return s.M2 != nil
 	},
+	func(s *testStruct) bool {
+		if s == nil {
+			return false
+		}
+		return len(s.M3) != 0
+	},
+	func(s *testStruct) bool {
+		if s == nil {
+			return false
+		}
+		return len(s.M4) != 0
+	},
 }
 
 func TestUnionRatcheting(t *testing.T) {
@@ -224,7 +238,7 @@ func TestUnionRatcheting(t *testing.T) {
 			oldStruct: nil,
 			newStruct: &testStruct{},
 			expected: field.ErrorList{
-				field.Invalid(nil, "", "must specify one of: `m1`, `m2`"),
+				field.Invalid(nil, "", "must specify one of: `m1`, `m2`, `m3`, `m4`"),
 			}.WithOrigin("union"),
 		},
 		{
@@ -253,14 +267,40 @@ func TestUnionRatcheting(t *testing.T) {
 				M2: &m2{},
 			},
 			expected: field.ErrorList{
-				field.Invalid(nil, "{m1, m2}", "must specify exactly one of: `m1`, `m2`"),
+				field.Invalid(nil, "{m1, m2}", "must specify exactly one of: `m1`, `m2`, `m3`, `m4`"),
+			}.WithOrigin("union"),
+		},
+		{
+			name:      "slice member ratcheting: unchanged membership",
+			oldStruct: &testStruct{M3: []string{"a"}},
+			newStruct: &testStruct{M3: []string{"b"}},
+		},
+		{
+			name:      "map member ratcheting: unchanged membership",
+			oldStruct: &testStruct{M4: map[string]string{"k": "v1"}},
+			newStruct: &testStruct{M4: map[string]string{"k": "v2"}},
+		},
+		{
+			name:      "empty slice is not set",
+			oldStruct: nil,
+			newStruct: &testStruct{M3: []string{}},
+			expected: field.ErrorList{
+				field.Invalid(nil, "", "must specify one of: `m1`, `m2`, `m3`, `m4`"),
+			}.WithOrigin("union"),
+		},
+		{
+			name:      "empty map is not set",
+			oldStruct: nil,
+			newStruct: &testStruct{M4: map[string]string{}},
+			expected: field.ErrorList{
+				field.Invalid(nil, "", "must specify one of: `m1`, `m2`, `m3`, `m4`"),
 			}.WithOrigin("union"),
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			members := []UnionMember{NewUnionMember("m1"), NewUnionMember("m2")}
+			members := []UnionMember{NewUnionMember("m1"), NewUnionMember("m2"), NewUnionMember("m3"), NewUnionMember("m4")}
 			got := Union(context.Background(), operation.Operation{Type: operation.Update}, nil, tc.newStruct, tc.oldStruct,
 				NewUnionMembership(members...), extractors...)
 			if !reflect.DeepEqual(got, tc.expected) {
@@ -271,9 +311,11 @@ func TestUnionRatcheting(t *testing.T) {
 }
 
 type testDiscriminatedStruct struct {
-	D  string `json:"d"`
-	M1 *m1    `json:"m1"`
-	M2 *m2    `json:"m2"`
+	D  string            `json:"d"`
+	M1 *m1               `json:"m1"`
+	M2 *m2               `json:"m2"`
+	M3 []string          `json:"m3"`
+	M4 map[string]string `json:"m4"`
 }
 
 var testDiscriminatorExtractor = func(s *testDiscriminatedStruct) string {
@@ -294,6 +336,18 @@ var testDiscriminatedExtractors = []ExtractorFn[*testDiscriminatedStruct, bool]{
 			return false
 		}
 		return s.M2 != nil
+	},
+	func(s *testDiscriminatedStruct) bool {
+		if s == nil {
+			return false
+		}
+		return len(s.M3) != 0
+	},
+	func(s *testDiscriminatedStruct) bool {
+		if s == nil {
+			return false
+		}
+		return len(s.M4) != 0
 	},
 }
 
@@ -366,11 +420,61 @@ func TestDiscriminatedUnionRatcheting(t *testing.T) {
 				field.Invalid(field.NewPath("m2"), "", "must be specified when `d` is \"m2\""),
 			}.WithOrigin("union"),
 		},
+		{
+			name: "slice member ratcheting: unchanged membership",
+			oldStruct: &testDiscriminatedStruct{
+				D:  "m3",
+				M3: []string{"a"},
+			},
+			newStruct: &testDiscriminatedStruct{
+				D:  "m3",
+				M3: []string{"b"},
+			},
+		},
+		{
+			name: "map member ratcheting: unchanged membership",
+			oldStruct: &testDiscriminatedStruct{
+				D:  "m4",
+				M4: map[string]string{"k": "v1"},
+			},
+			newStruct: &testDiscriminatedStruct{
+				D:  "m4",
+				M4: map[string]string{"k": "v2"},
+			},
+		},
+		{
+			name: "empty slice is not set",
+			oldStruct: &testDiscriminatedStruct{
+				D:  "m3",
+				M3: []string{"a"},
+			},
+			newStruct: &testDiscriminatedStruct{
+				D:  "m3",
+				M3: []string{},
+			},
+			expected: field.ErrorList{
+				field.Invalid(field.NewPath("m3"), "", "must be specified when `d` is \"m3\""),
+			}.WithOrigin("union"),
+		},
+		{
+			name: "empty map is not set",
+			oldStruct: &testDiscriminatedStruct{
+				D:  "m4",
+				M4: map[string]string{"k": "v"},
+			},
+			newStruct: &testDiscriminatedStruct{
+				D:  "m4",
+				M4: map[string]string{},
+			},
+			expected: field.ErrorList{
+				field.Invalid(field.NewPath("m4"), "", "must be specified when `d` is \"m4\""),
+			}.WithOrigin("union"),
+		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			members := []UnionMember{NewDiscriminatedUnionMember("m1", "m1"), NewDiscriminatedUnionMember("m2", "m2")}
+			members := []UnionMember{NewDiscriminatedUnionMember("m1", "m1"), NewDiscriminatedUnionMember("m2", "m2"), NewDiscriminatedUnionMember("m3", "m3"), NewDiscriminatedUnionMember("m4", "m4")}
 			got := DiscriminatedUnion(context.Background(), operation.Operation{Type: operation.Update}, nil, tc.newStruct, tc.oldStruct,
 				NewDiscriminatedUnionMembership("d", members...), testDiscriminatorExtractor, testDiscriminatedExtractors...)
 			if !reflect.DeepEqual(got, tc.expected) {
