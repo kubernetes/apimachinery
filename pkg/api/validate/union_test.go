@@ -239,7 +239,7 @@ func TestUnionRatcheting(t *testing.T) {
 			newStruct: &testStruct{},
 			expected: field.ErrorList{
 				field.Invalid(nil, "", "must specify one of: `m1`, `m2`, `m3`, `m4`"),
-			}.WithOrigin("union"),
+			},
 		},
 		{
 			name:      "both empty struct",
@@ -268,7 +268,7 @@ func TestUnionRatcheting(t *testing.T) {
 			},
 			expected: field.ErrorList{
 				field.Invalid(nil, "{m1, m2}", "must specify exactly one of: `m1`, `m2`, `m3`, `m4`"),
-			}.WithOrigin("union"),
+			},
 		},
 		{
 			name:      "slice member ratcheting: unchanged membership",
@@ -286,7 +286,7 @@ func TestUnionRatcheting(t *testing.T) {
 			newStruct: &testStruct{M3: []string{}},
 			expected: field.ErrorList{
 				field.Invalid(nil, "", "must specify one of: `m1`, `m2`, `m3`, `m4`"),
-			}.WithOrigin("union"),
+			},
 		},
 		{
 			name:      "empty map is not set",
@@ -294,7 +294,7 @@ func TestUnionRatcheting(t *testing.T) {
 			newStruct: &testStruct{M4: map[string]string{}},
 			expected: field.ErrorList{
 				field.Invalid(nil, "", "must specify one of: `m1`, `m2`, `m3`, `m4`"),
-			}.WithOrigin("union"),
+			},
 		},
 	}
 
@@ -454,7 +454,7 @@ func TestDiscriminatedUnionRatcheting(t *testing.T) {
 			},
 			expected: field.ErrorList{
 				field.Invalid(field.NewPath("m3"), "", "must be specified when `d` is \"m3\""),
-			}.WithOrigin("union"),
+			},
 		},
 		{
 			name: "empty map is not set",
@@ -468,7 +468,7 @@ func TestDiscriminatedUnionRatcheting(t *testing.T) {
 			},
 			expected: field.ErrorList{
 				field.Invalid(field.NewPath("m4"), "", "must be specified when `d` is \"m4\""),
-			}.WithOrigin("union"),
+			},
 		},
 	}
 
