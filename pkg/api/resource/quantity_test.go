@@ -33,6 +33,7 @@ import (
 	"sigs.k8s.io/randfill"
 
 	cbor "k8s.io/apimachinery/pkg/runtime/serializer/cbor/direct"
+	"k8s.io/utils/ptr"
 )
 
 var (
@@ -1818,5 +1819,89 @@ func TestQuantityRoundtripCBOR(t *testing.T) {
 			}
 			t.Errorf("Expected equal: %v, %v (cbor was '%s')", initial, final, diag)
 		}
+	}
+}
+
+func TestParseQuantity(t *testing.T) {
+	ptrDec := func(s string) *infDecAmount {
+		d, ok := new(inf.Dec).SetString(s)
+		if !ok {
+			t.Fatalf("invalid dec: %s", s)
+		}
+		return &infDecAmount{d}
+	}
+
+	tests := []struct {
+		input       string
+		wantAsInt64 *int64
+		wantAsDec   *infDecAmount
+		canonical   string
+	}{
+		// min/max 18 digits
+		{input: "-999999999999999999", wantAsInt64: ptr.To[int64](-999999999999999999), wantAsDec: ptrDec("-999999999999999999")},
+		{input: "999999999999999999", wantAsInt64: ptr.To[int64](999999999999999999), wantAsDec: ptrDec("999999999999999999")},
+
+		// min/max 19 digits
+		{input: "-9999999999999999999", wantAsInt64: nil, wantAsDec: ptrDec("-9999999999999999999")},
+		{input: "9999999999999999999", wantAsInt64: nil, wantAsDec: ptrDec("9999999999999999999")},
+		{input: "-1E", wantAsInt64: ptr.To[int64](-1000000000000000000), wantAsDec: ptrDec("-1000000000000000000"), canonical: "-1E"},
+		{input: "1E", wantAsInt64: ptr.To[int64](1000000000000000000), wantAsDec: ptrDec("1000000000000000000"), canonical: "1E"},
+		{input: "-1000000000000000000", wantAsInt64: nil, wantAsDec: ptrDec("-1000000000000000000"), canonical: "-1E"}, // should be wantAsInt64: <value>
+		{input: "1000000000000000000", wantAsInt64: nil, wantAsDec: ptrDec("1000000000000000000"), canonical: "1E"},    // should be wantAsInt64: <value>
+
+		// min/max 20 digits
+		{input: "-10E", wantAsInt64: nil, wantAsDec: ptrDec("-10000000000000000000"), canonical: "-10E"},
+		{input: "10E", wantAsInt64: nil, wantAsDec: ptrDec("10000000000000000000"), canonical: "10E"},
+		{input: "-10000000000000000000", wantAsInt64: nil, wantAsDec: ptrDec("-10000000000000000000"), canonical: "-10E"},
+		{input: "10000000000000000000", wantAsInt64: nil, wantAsDec: ptrDec("10000000000000000000"), canonical: "10E"},
+
+		// min/max int64 - 1
+		{input: "-9223372036854775809", wantAsInt64: nil, wantAsDec: ptrDec("-9223372036854775809")},
+		{input: "9223372036854775806", wantAsInt64: nil, wantAsDec: ptrDec("9223372036854775806")}, // should be wantAsInt64: <value>
+
+		// min/max int64
+		{input: "-9223372036854775808", wantAsInt64: nil, wantAsDec: ptrDec("-9223372036854775808")}, // should be wantAsInt64: <value>
+		{input: "9223372036854775807", wantAsInt64: nil, wantAsDec: ptrDec("9223372036854775807")},   // should be wantAsInt64: <value>
+
+		// min/max int64 + 1
+		{input: "-9223372036854775807", wantAsInt64: nil, wantAsDec: ptrDec("-9223372036854775807")}, // should be wantAsInt64: <value>
+		{input: "9223372036854775808", wantAsInt64: nil, wantAsDec: ptrDec("9223372036854775808")},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			q, err := ParseQuantity(tt.input)
+			if err != nil {
+				t.Fatalf("unexpected error for input %q: %v", tt.input, err)
+			}
+
+			val, ok := q.AsInt64()
+			if tt.wantAsInt64 != nil {
+				if !ok {
+					t.Errorf("AsInt64() returned ok=false for input %q, want ok=true and value %d", tt.input, *tt.wantAsInt64)
+				} else if val != *tt.wantAsInt64 {
+					t.Errorf("AsInt64() returned value %d for input %q, want value %d", val, tt.input, *tt.wantAsInt64)
+				}
+			} else {
+				if ok {
+					t.Errorf("AsInt64() returned ok=true and value %d for input %q, want ok=false", val, tt.input)
+				}
+			}
+
+			if tt.wantAsDec != nil {
+				if q.AsDec().Cmp(tt.wantAsDec.Dec) != 0 {
+					t.Errorf("AsDec() returned %s for input %q, want %s", q.AsDec().String(), tt.input, tt.wantAsDec.Dec.String())
+				}
+			}
+
+			serialized := q.String()
+			expectedString := tt.input
+			if tt.canonical != "" {
+				expectedString = tt.canonical
+			}
+			if serialized != expectedString {
+				t.Errorf("expected input %q to reserialize to %q but got %q", tt.input, expectedString, serialized)
+			}
+		})
 	}
 }
