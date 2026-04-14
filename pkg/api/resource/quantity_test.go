@@ -1844,14 +1844,14 @@ func TestParseQuantity(t *testing.T) {
 		// min/max 19 digits
 		{input: "-9999999999999999999", wantAsInt64: nil, wantAsDec: ptrDec("-9999999999999999999")},
 		{input: "9999999999999999999", wantAsInt64: nil, wantAsDec: ptrDec("9999999999999999999")},
-		{input: "-1E", wantAsInt64: ptr.To[int64](-1000000000000000000), wantAsDec: ptrDec("-1000000000000000000"), canonical: "-1E"},
-		{input: "1E", wantAsInt64: ptr.To[int64](1000000000000000000), wantAsDec: ptrDec("1000000000000000000"), canonical: "1E"},
+		{input: "-1E", wantAsInt64: ptr.To[int64](-1000000000000000000), wantAsDec: ptrDec("-1000000000000000000")},
+		{input: "1E", wantAsInt64: ptr.To[int64](1000000000000000000), wantAsDec: ptrDec("1000000000000000000")},
 		{input: "-1000000000000000000", wantAsInt64: nil, wantAsDec: ptrDec("-1000000000000000000"), canonical: "-1E"}, // should be wantAsInt64: <value>
 		{input: "1000000000000000000", wantAsInt64: nil, wantAsDec: ptrDec("1000000000000000000"), canonical: "1E"},    // should be wantAsInt64: <value>
 
 		// min/max 20 digits
-		{input: "-10E", wantAsInt64: nil, wantAsDec: ptrDec("-10000000000000000000"), canonical: "-10E"},
-		{input: "10E", wantAsInt64: nil, wantAsDec: ptrDec("10000000000000000000"), canonical: "10E"},
+		{input: "-10E", wantAsInt64: nil, wantAsDec: ptrDec("-10000000000000000000")},
+		{input: "10E", wantAsInt64: nil, wantAsDec: ptrDec("10000000000000000000")},
 		{input: "-10000000000000000000", wantAsInt64: nil, wantAsDec: ptrDec("-10000000000000000000"), canonical: "-10E"},
 		{input: "10000000000000000000", wantAsInt64: nil, wantAsDec: ptrDec("10000000000000000000"), canonical: "10E"},
 
@@ -1897,6 +1897,9 @@ func TestParseQuantity(t *testing.T) {
 			serialized := q.String()
 			expectedString := tt.input
 			if tt.canonical != "" {
+				if tt.canonical == tt.input {
+					t.Errorf("unnecessary identical explicit canonical value in testcase")
+				}
 				expectedString = tt.canonical
 			}
 			if serialized != expectedString {
