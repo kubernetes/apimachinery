@@ -19,9 +19,7 @@ package validate
 import (
 	"context"
 	"fmt"
-	"math"
 	"testing"
-	"unsafe"
 
 	"k8s.io/apimachinery/pkg/api/operation"
 	"k8s.io/apimachinery/pkg/api/validate/constraints"
@@ -241,14 +239,16 @@ func TestMaxProperties(t *testing.T) {
 			field.TooMany(field.NewPath("fldpath"), 2, 1).WithOrigin("maxProperties"),
 		},
 	}, {
-		name:       "0 properties, max MaxInt",
-		properties: 0,
-		max:        math.MaxInt,
+		name:       "100000 properties, max 100000",
+		properties: 100000,
+		max:        100000,
 	}, {
-		name:       "1 property, max MaxInt",
-		properties: 1,
-		max:        math.MaxInt,
-
+		name:       "100001 properties, max 100000",
+		properties: 100001,
+		max:        100000,
+		wantErrs: field.ErrorList{
+			field.TooMany(field.NewPath("fldpath"), 100001, 100000).WithOrigin("maxProperties"),
+		},
 	}, {
 		// Note: While JSON Schema does not allow negative values for maxProperties,
 		// we test that the validator handles it safely if it ever occurs at runtime.
