@@ -207,3 +207,13 @@ func (t MicroTime) MarshalQueryParameter() (string, error) {
 
 	return t.UTC().Format(RFC3339Micro), nil
 }
+
+// GoString implements fmt.GoStringer and formats t to be printed in Go source
+// code. It handles nil receivers to prevent nil pointer dereference when the
+// embedded time.Time field is accessed through a nil *MicroTime pointer.
+func (t *MicroTime) GoString() string {
+	if t == nil {
+		return "metav1.NewMicroTime(time.Time{})"
+	}
+	return t.Time.GoString()
+}

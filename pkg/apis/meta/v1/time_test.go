@@ -325,3 +325,24 @@ func TestTimeRoundtripCBOR(t *testing.T) {
 		}
 	}
 }
+
+func TestTimeGoString(t *testing.T) {
+	t1 := NewTime(time.Now())
+	cases := []struct {
+		name string
+		x    *Time
+	}{
+		{"nil", nil},
+		{"not nil", &t1},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			// Should not panic
+			result := c.x.GoString()
+			if len(result) == 0 {
+				t.Errorf("GoString returned empty string for %v", c.x)
+			}
+		})
+	}
+}

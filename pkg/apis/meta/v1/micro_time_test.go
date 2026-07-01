@@ -400,3 +400,24 @@ func TestMicroTimeRoundtripCBOR(t *testing.T) {
 		}
 	}
 }
+
+func TestMicroTimeGoString(t *testing.T) {
+	t1 := NewMicroTime(time.Now())
+	cases := []struct {
+		name string
+		x    *MicroTime
+	}{
+		{"nil", nil},
+		{"not nil", &t1},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			// Should not panic
+			result := c.x.GoString()
+			if len(result) == 0 {
+				t.Errorf("GoString returned empty string for %v", c.x)
+			}
+		})
+	}
+}
