@@ -21,7 +21,7 @@ require (
 	gopkg.in/inf.v0 v0.9.1
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/kube-openapi v0.0.0-20260908163437-c4db2bdfbfe6
-	k8s.io/streaming v0.0.0-20260925174948-82cc75b1f3b1
+	k8s.io/streaming v0.0.0
 	k8s.io/utils v0.0.0-20260626114624-be93311217bd
 	sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730
 	sigs.k8s.io/randfill v1.0.0
@@ -31,7 +31,7 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
-	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/logr v1.4.4 // indirect
 	github.com/go-openapi/jsonpointer v1.0.0 // indirect
 	github.com/go-openapi/jsonreference v1.0.0 // indirect
 	github.com/go-openapi/swag v0.27.1 // indirect
@@ -53,3 +53,5 @@ require (
 	golang.org/x/text v0.42.0 // indirect
 	google.golang.org/protobuf v1.36.12 // indirect
 )
+
+replace k8s.io/streaming => ../streaming
