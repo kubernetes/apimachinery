@@ -68,8 +68,8 @@ k8s.io/ktesting v0.0.0-20261102163952-bc538521d450 h1:KnOAA4/Q+ULAVl/3qKz3EMnDky
 k8s.io/ktesting v0.0.0-20261102163952-bc538521d450/go.mod h1:5cuEyae81HMpIwUx1JX78204Zhmrj4J1yqRc2aE060o=
 k8s.io/kube-openapi v0.0.0-20261014044854-ca3452a79603 h1:9zl8YVFBvuURO1ZrSa1SFWyfbnzyll2ivV163KCkRs0=
 k8s.io/kube-openapi v0.0.0-20261014044854-ca3452a79603/go.mod h1:ijAJHxCK/9OftZdcKwI5BHyIeRUeoKe1ldIyM4JHMts=
-k8s.io/streaming v0.0.0-20261102164054-f3c80b94db5e h1:e3Gvu14EPR+U8EWrwEjoVuid7/JMIeSQ1+bw61eLZxM=
-k8s.io/streaming v0.0.0-20261102164054-f3c80b94db5e/go.mod h1:f9sXMyoFlA0/ENq79bTEZ0F6PkICZvH5A4s8v2oBchc=
+k8s.io/streaming v0.0.0-20261108044107-0e656739c287 h1:vud+uZRwdsj0ui8lFvYlejSsU7u/jxHE72ymaxldrUQ=
+k8s.io/streaming v0.0.0-20261108044107-0e656739c287/go.mod h1:f9sXMyoFlA0/ENq79bTEZ0F6PkICZvH5A4s8v2oBchc=
 k8s.io/utils v0.0.0-20260626114624-be93311217bd h1:Ea7fgQ5we8Y9T0OX5o0dAHzQOBRI07D/dEYRaB9ZZEs=
 k8s.io/utils v0.0.0-20260626114624-be93311217bd/go.mod h1:xDxuJ0whA3d0I4mf/C4ppKHxXynQ+fxnkmQH0vTHnuk=
 sigs.k8s.io/json v0.0.0-20250730193827-2d320260d730 h1:IpInykpT6ceI+QxKBbEflcR5EXP7sU1kvOlxwZh5txg=
